@@ -59,11 +59,12 @@ export default function FamilyLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon emoji="👤" label="Perfil" focused={focused} />
-          ),
         }}
       />
       <Tabs.Screen name="new-request" options={{ href: null }} />
       <Tabs.Screen name="companion/[id]" options={{ href: null }} />
+      <Tabs.Screen name="tracking/[id]" options={{ href: null }} />
+      <Tabs.Screen name="rate/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
