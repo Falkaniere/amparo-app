@@ -1,11 +1,14 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AmparoLogo } from '@/components/ui/AmparoLogo';
 import { colors } from '@/constants/theme';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 export default function WelcomeScreen() {
+  const { request, promptAsync } = useGoogleAuth();
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -25,6 +28,17 @@ export default function WelcomeScreen() {
           onPress={() => router.push('/(auth)/register')}
         >
           <Text style={styles.btnText}>Começar</Text>
+        </Pressable>
+        <Pressable
+          style={styles.googleBtn}
+          onPress={() => promptAsync()}
+          disabled={!request}
+        >
+          {!request ? (
+            <ActivityIndicator color={colors.dark} size="small" />
+          ) : (
+            <Text style={styles.googleBtnText}>Continuar com Google</Text>
+          )}
         </Pressable>
         <Pressable onPress={() => router.push('/(auth)/login')}>
           <Text style={styles.link}>Já tenho conta · Entrar</Text>
@@ -85,6 +99,22 @@ const styles = StyleSheet.create({
     color: colors.dark,
     fontSize: 14,
     fontWeight: '700',
+  },
+  googleBtn: {
+    marginTop: 8,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    paddingHorizontal: 40,
+    paddingVertical: 12,
+    minWidth: 200,
+    alignItems: 'center',
+  },
+  googleBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   link: {
     color: 'rgba(255,255,255,0.6)',

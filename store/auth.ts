@@ -5,7 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'family' | 'companion';
+  role: 'family' | 'companion' | null;
 }
 
 interface AuthState {

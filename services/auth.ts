@@ -27,4 +27,23 @@ export const authService = {
       { method: 'POST', body: JSON.stringify({ refresh_token }) }
     );
   },
+
+  async googleLogin(payload: { code: string; codeVerifier?: string; redirectUri: string }) {
+    return apiFetch<{
+      access_token: string;
+      refresh_token: string;
+      user: { id: string; email: string; name: string; role: 'family' | 'companion' | null };
+    }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async setRole(role: 'family' | 'companion', token: string) {
+    return apiFetch<{ role: string }>('/auth/role', {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ role }),
+    });
+  },
 };
