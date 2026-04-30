@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/constants/theme';
 
 function TabIcon({
@@ -22,12 +23,15 @@ function TabIcon({
 }
 
 export default function FamilyLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom + 6 }],
         tabBarShowLabel: false,
+        tabBarIconStyle: { width: '100%' },
       }}
     >
       <Tabs.Screen
@@ -62,6 +66,10 @@ export default function FamilyLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="new-request" options={{ href: null }} />
+      <Tabs.Screen name="companion/[id]" options={{ href: null }} />
+      <Tabs.Screen name="tracking/[id]" options={{ href: null }} />
+      <Tabs.Screen name="rate/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
@@ -71,11 +79,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderTopColor: colors.border,
     borderTopWidth: 0.5,
-    height: 60,
-    paddingBottom: 8,
     paddingTop: 6,
   },
-  tabIcon: { alignItems: 'center', gap: 2 },
+  tabIcon: {
+    alignItems: 'center',
+    gap: 2,
+  },
   emoji: { fontSize: 18 },
   tabLabel: { fontSize: 9, fontWeight: '700', color: colors.muted },
   tabLabelActive: { color: colors.primary },
