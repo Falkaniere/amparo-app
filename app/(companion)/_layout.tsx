@@ -1,11 +1,24 @@
 import { Tabs } from 'expo-router';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors } from '@/constants/theme';
 
-function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
+function TabIcon({
+  emoji,
+  label,
+  focused,
+}: {
+  emoji: string;
+  label: string;
+  focused: boolean;
+}) {
   return (
-    <View className="items-center gap-0.5">
-      <Text style={{ fontSize: 18 }}>{emoji}</Text>
-      <Text className={`text-[9px] font-bold ${focused ? 'text-primary' : 'text-muted'}`}>
+    <View style={styles.tabIcon}>
+      <Text style={styles.emoji}>{emoji}</Text>
+      <Text
+        style={[styles.tabLabel, focused && styles.tabLabelActive]}
+        numberOfLines={1}
+      >
         {label}
       </Text>
     </View>
@@ -13,18 +26,13 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
 }
 
 export default function CompanionLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E8E8E4',
-          borderTopWidth: 0.5,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
-        },
+        tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom + 6 }],
         tabBarShowLabel: false,
       }}
     >
@@ -48,3 +56,20 @@ export default function CompanionLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.card,
+    borderTopColor: colors.border,
+    borderTopWidth: 0.5,
+    paddingTop: 6,
+  },
+  tabIcon: {
+    alignItems: 'center',
+    gap: 2,
+    width: '100%',
+  },
+  emoji: { fontSize: 18 },
+  tabLabel: { fontSize: 9, fontWeight: '700', color: colors.muted },
+  tabLabelActive: { color: colors.primary },
+});

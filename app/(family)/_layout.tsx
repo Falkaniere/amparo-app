@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/constants/theme';
 
 function TabIcon({
@@ -14,7 +15,10 @@ function TabIcon({
   return (
     <View style={styles.tabIcon}>
       <Text style={styles.emoji}>{emoji}</Text>
-      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
+      <Text
+        style={[styles.tabLabel, focused && styles.tabLabelActive]}
+        numberOfLines={1}
+      >
         {label}
       </Text>
     </View>
@@ -22,11 +26,13 @@ function TabIcon({
 }
 
 export default function FamilyLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom + 6 }],
         tabBarShowLabel: false,
       }}
     >
@@ -75,11 +81,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderTopColor: colors.border,
     borderTopWidth: 0.5,
-    height: 60,
-    paddingBottom: 8,
     paddingTop: 6,
   },
-  tabIcon: { alignItems: 'center', gap: 2 },
+  tabIcon: {
+    alignItems: 'center',
+    gap: 2,
+    width: '100%',
+  },
   emoji: { fontSize: 18 },
   tabLabel: { fontSize: 9, fontWeight: '700', color: colors.muted },
   tabLabelActive: { color: colors.primary },
