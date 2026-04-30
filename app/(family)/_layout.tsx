@@ -62,6 +62,8 @@ export default function FamilyLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="new-request" options={{ href: null }} />
+      <Tabs.Screen name="companion/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
