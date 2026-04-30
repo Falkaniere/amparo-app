@@ -44,6 +44,7 @@ export default function CompanionLayout() {
         name="profile"
         options={{ tabBarIcon: ({ focused }) => <TabIcon emoji="👤" label="Perfil" focused={focused} /> }}
       />
+      <Tabs.Screen name="request/[id]" options={{ href: null }} />
     </Tabs>
   );
 }
