@@ -59,7 +59,6 @@ export default function FamilyLayout() {
         options={{
           tabBarIcon: ({ focused }) => (
             <TabIcon emoji="👤" label="Perfil" focused={focused} />
-          ),
         }}
       />
       <Tabs.Screen name="new-request" options={{ href: null }} />
