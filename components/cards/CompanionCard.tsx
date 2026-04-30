@@ -1,4 +1,5 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { colors, radius } from '@/constants/theme';
 
 interface Props {
   companion: {
@@ -7,57 +8,87 @@ interface Props {
     avg_rating: number;
     total_services: number;
     distance_km: number;
-    bio?: string;
   };
   onPress: () => void;
 }
 
-// Gera iniciais a partir do user_id para placeholder
-function getInitials(id: string) {
-  return id.slice(0, 2).toUpperCase();
-}
-
 const AVATAR_COLORS = ['#E1F5EE', '#EEEDFE', '#FAEEDA', '#FCEBEB'];
-const TEXT_COLORS   = ['#085041', '#3C3489', '#633806', '#712B13'];
+const TEXT_COLORS = ['#085041', '#3C3489', '#633806', '#712B13'];
 
 export function CompanionCard({ companion, onPress }: Props) {
-  const colorIdx = companion.id.charCodeAt(0) % AVATAR_COLORS.length;
+  const idx = companion.id.charCodeAt(0) % AVATAR_COLORS.length;
 
   return (
-    <Pressable
-      className="bg-white border border-border rounded-xl p-3 mb-2 flex-row items-center gap-3 active:opacity-80"
-      onPress={onPress}
-    >
-      {/* Avatar */}
-      <View
-        className="w-10 h-10 rounded-full items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: AVATAR_COLORS[colorIdx] }}
-      >
-        <Text className="text-xs font-bold" style={{ color: TEXT_COLORS[colorIdx] }}>
-          {getInitials(companion.id)}
+    <Pressable style={styles.card} onPress={onPress}>
+      <View style={[styles.avatar, { backgroundColor: AVATAR_COLORS[idx] }]}>
+        <Text style={[styles.avatarText, { color: TEXT_COLORS[idx] }]}>
+          {companion.id.slice(0, 2).toUpperCase()}
         </Text>
       </View>
-
-      {/* Info */}
-      <View className="flex-1">
-        <Text className="text-sm font-bold text-dark">Acompanhante</Text>
-        <View className="flex-row items-center gap-1 mt-0.5">
-          <Text className="text-amber text-xs font-bold">★ {companion.avg_rating.toFixed(1)}</Text>
-          <Text className="text-muted text-[10px]">· {companion.total_services} serviços</Text>
-        </View>
-        <View className="flex-row items-center gap-2 mt-1">
-          <View className="bg-light rounded px-1.5 py-0.5">
-            <Text className="text-dark text-[9px] font-bold">Disponível</Text>
+      <View style={styles.info}>
+        <Text style={styles.name}>Acompanhante</Text>
+        <Text style={styles.rating}>
+          ★ {companion.avg_rating.toFixed(1)}
+          <Text style={styles.services}>
+            {' '}
+            · {companion.total_services} serviços
+          </Text>
+        </Text>
+        <View style={styles.tags}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Disponível</Text>
           </View>
-          <Text className="text-muted text-[10px]">{companion.distance_km} km</Text>
+          <Text style={styles.distance}>{companion.distance_km} km</Text>
         </View>
       </View>
-
-      {/* Preço */}
-      <View className="items-end">
-        <Text className="text-primary text-base font-bold">R${companion.hourly_rate}</Text>
-        <Text className="text-muted text-[10px]">/hora</Text>
+      <View style={styles.priceBox}>
+        <Text style={styles.price}>R${companion.hourly_rate}</Text>
+        <Text style={styles.perHour}>/hora</Text>
       </View>
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.card,
+    borderWidth: 0.5,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  avatarText: { fontSize: 12, fontWeight: '700' },
+  info: { flex: 1 },
+  name: { fontSize: 13, fontWeight: '700', color: colors.text },
+  rating: {
+    fontSize: 11,
+    color: colors.amber,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  services: { color: colors.muted, fontWeight: '400' },
+  tags: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 },
+  badge: {
+    backgroundColor: colors.light,
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgeText: { color: colors.dark, fontSize: 9, fontWeight: '700' },
+  distance: { color: colors.muted, fontSize: 10 },
+  priceBox: { alignItems: 'flex-end' },
+  price: { fontSize: 16, fontWeight: '700', color: colors.primary },
+  perHour: { fontSize: 10, color: colors.muted },
+});

@@ -13,7 +13,12 @@ export function AmparoLogo({ size = 40, color = '#1D9E75' }: Props) {
         fill={color}
         opacity={0.9}
       />
-      <Circle cx={20} cy={18.5} r={4.5} fill={color === 'white' ? '#1D9E75' : '#fff'} />
+      <Circle
+        cx={20}
+        cy={18.5}
+        r={4.5}
+        fill={color === 'white' ? '#1D9E75' : '#fff'}
+      />
     </Svg>
   );
 }
