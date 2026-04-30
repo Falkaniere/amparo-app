@@ -15,10 +15,7 @@ function TabIcon({
   return (
     <View style={styles.tabIcon}>
       <Text style={styles.emoji}>{emoji}</Text>
-      <Text
-        style={[styles.tabLabel, focused && styles.tabLabelActive]}
-        numberOfLines={1}
-      >
+      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
         {label}
       </Text>
     </View>
@@ -34,6 +31,7 @@ export default function CompanionLayout() {
         headerShown: false,
         tabBarStyle: [styles.tabBar, { paddingBottom: insets.bottom + 6 }],
         tabBarShowLabel: false,
+        tabBarIconStyle: { width: '100%' },
       }}
     >
       <Tabs.Screen
@@ -67,7 +65,6 @@ const styles = StyleSheet.create({
   tabIcon: {
     alignItems: 'center',
     gap: 2,
-    width: '100%',
   },
   emoji: { fontSize: 18 },
   tabLabel: { fontSize: 9, fontWeight: '700', color: colors.muted },
