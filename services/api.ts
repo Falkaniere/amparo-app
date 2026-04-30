@@ -1,16 +1,25 @@
 const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
 
-export async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  opts: RequestInit & { token?: string } = {}
+): Promise<T> {
+  const { token, ...rest } = opts;
+
   const res = await fetch(`${API_URL}${path}`, {
-    ...opts,
+    ...rest,
     headers: {
       'Content-Type': 'application/json',
-      ...opts?.headers,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...rest.headers,
     },
   });
+
+  const data = await res.json();
+
   if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error || `HTTP ${res.status}`);
+    throw new Error(data?.error || `HTTP ${res.status}`);
   }
-  return res.json();
+
+  return data as T;
 }
