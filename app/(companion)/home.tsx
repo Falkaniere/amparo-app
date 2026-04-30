@@ -19,6 +19,7 @@ import { colors, radius } from '@/constants/theme';
 export default function CompanionHomeScreen() {
   const { user, token } = useAuthStore();
   const [isOnline, setIsOnline] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const [requests, setRequests] = useState<any[]>([]);
   const [earnings] = useState({ week: 0, month: 0, total: 0 });
   const [loading, setLoading] = useState(true);
@@ -41,11 +42,15 @@ export default function CompanionHomeScreen() {
   }
 
   async function toggleOnline(val: boolean) {
+    if (isToggling) return;
+    setIsToggling(true);
     setIsOnline(val);
     try {
       await profileService.setOnline(token!, val);
     } catch {
       setIsOnline(!val);
+    } finally {
+      setIsToggling(false);
     }
   }
 
@@ -69,6 +74,7 @@ export default function CompanionHomeScreen() {
           <Switch
             value={isOnline}
             onValueChange={toggleOnline}
+            disabled={isToggling}
             trackColor={{ false: '#555', true: colors.primary }}
             thumbColor="#fff"
           />
