@@ -13,12 +13,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/store/auth';
 import { authService } from '@/services/auth';
 import { colors, radius } from '@/constants/theme';
+import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuthStore();
+  const { request, promptAsync } = useGoogleAuth();
 
   async function handleLogin() {
     if (!email || !password) {
@@ -88,6 +90,24 @@ export default function LoginScreen() {
           )}
         </Pressable>
 
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>ou</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        <Pressable
+          style={styles.googleBtn}
+          onPress={() => promptAsync()}
+          disabled={!request}
+        >
+          {!request ? (
+            <ActivityIndicator color={colors.dark} size="small" />
+          ) : (
+            <Text style={styles.googleBtnText}>Continuar com Google</Text>
+          )}
+        </Pressable>
+
         <Pressable
           style={styles.registerLink}
           onPress={() => router.push('/(auth)/register')}
@@ -140,6 +160,19 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  dividerRow: { flexDirection: 'row', alignItems: 'center', marginTop: 24, gap: 8 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: colors.border },
+  dividerText: { color: colors.muted, fontSize: 12 },
+  googleBtn: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: 12,
+    backgroundColor: colors.card,
+  },
+  googleBtnText: { color: colors.dark, fontWeight: '600', fontSize: 14 },
   registerLink: { alignItems: 'center', marginTop: 16 },
   registerText: { color: colors.muted, fontSize: 12 },
   registerTextBold: { color: colors.primary, fontWeight: '700' },
