@@ -6,6 +6,7 @@ export interface User {
   email: string;
   name: string;
   role: 'family' | 'companion' | null;
+  companion_status?: 'pending' | 'approved' | 'rejected' | null;
 }
 
 interface AuthState {
