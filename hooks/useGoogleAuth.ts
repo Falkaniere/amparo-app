@@ -9,19 +9,25 @@ import { useAuthStore } from '@/store/auth';
 
 WebBrowser.maybeCompleteAuthSession();
 
+const redirectUri = makeRedirectUri({ scheme: 'amparo' });
+
 export function useGoogleAuth() {
   const { setAuth } = useAuthStore();
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    scopes: ['openid', 'profile', 'email'],
-  });
+  const [request, response, promptAsync] = Google.useAuthRequest(
+    {
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      scopes: ['openid', 'profile', 'email'],
+      redirectUri,
+    },
+  );
 
   useEffect(() => {
     if (response?.type !== 'success') return;
 
     const code = response.params.code;
-    const redirectUri = makeRedirectUri();
 
     (async () => {
       try {
