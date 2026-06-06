@@ -28,7 +28,7 @@ export const authService = {
     );
   },
 
-  async googleLogin(payload: { code: string; codeVerifier?: string; redirectUri: string }) {
+  async googleLogin(payload: { idToken: string }) {
     return apiFetch<{
       access_token: string;
       refresh_token: string;

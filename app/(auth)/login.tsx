@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuthStore();
-  const { request, promptAsync } = useGoogleAuth();
+  const { signIn: googleSignIn } = useGoogleAuth();
 
   async function handleLogin() {
     if (!email || !password) {
@@ -98,14 +98,9 @@ export default function LoginScreen() {
 
         <Pressable
           style={styles.googleBtn}
-          onPress={() => promptAsync()}
-          disabled={!request}
+          onPress={googleSignIn}
         >
-          {!request ? (
-            <ActivityIndicator color={colors.dark} size="small" />
-          ) : (
-            <Text style={styles.googleBtnText}>Continuar com Google</Text>
-          )}
+          <Text style={styles.googleBtnText}>Continuar com Google</Text>
         </Pressable>
 
         <Pressable
