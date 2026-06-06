@@ -46,8 +46,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-dev-client",
       "expo-router",
+      "@react-native-google-signin/google-signin",
       "expo-secure-store",
       [
         "expo-notifications",
