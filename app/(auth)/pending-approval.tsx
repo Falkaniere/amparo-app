@@ -38,9 +38,8 @@ export default function PendingApprovalScreen() {
         <Text style={styles.emoji}>⏳</Text>
         <Text style={styles.title}>Cadastro em análise</Text>
         <Text style={styles.subtitle}>
-          Nossa equipe está revisando seus documentos.{' '}Isso leva até 48 horas.{'
-
-'}
+          Nossa equipe está revisando seus documentos. Isso leva até 48 horas.
+          {'\n\n'}
           Você receberá uma notificação assim que for aprovado.
         </Text>
 
