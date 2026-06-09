@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ import { colors } from '@/constants/theme';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 export default function WelcomeScreen() {
-  const { request, promptAsync } = useGoogleAuth();
+  const { signIn } = useGoogleAuth();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,14 +31,9 @@ export default function WelcomeScreen() {
         </Pressable>
         <Pressable
           style={styles.googleBtn}
-          onPress={() => promptAsync()}
-          disabled={!request}
+          onPress={signIn}
         >
-          {!request ? (
-            <ActivityIndicator color={colors.dark} size="small" />
-          ) : (
-            <Text style={styles.googleBtnText}>Continuar com Google</Text>
-          )}
+          <Text style={styles.googleBtnText}>Continuar com Google</Text>
         </Pressable>
         <Pressable onPress={() => router.push('/(auth)/login')}>
           <Text style={styles.link}>Já tenho conta · Entrar</Text>
