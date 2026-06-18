@@ -42,6 +42,14 @@ export function useGoogleAuth() {
         Alert.alert('Erro', 'Google Play Services não disponível.');
         return;
       }
+      if (err.code === statusCodes.DEVELOPER_ERROR) {
+        Alert.alert(
+          'Erro de configuração',
+          'SHA-1 fingerprint não registrado no Firebase ou webClientId incorreto. Consulte o desenvolvedor.',
+        );
+        console.error('[GoogleSignIn] DEVELOPER_ERROR: registre o SHA-1 do EAS no Firebase Console', err);
+        return;
+      }
       Alert.alert('Erro', err.message || 'Falha ao entrar com Google.');
     }
   }, [setAuth]);
