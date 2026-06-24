@@ -36,20 +36,22 @@ export function useGoogleAuth() {
         router.replace('/(family)/home');
       }
     } catch (err: any) {
-      if (err.code === statusCodes.SIGN_IN_CANCELLED) return;
-      if (err.code === statusCodes.IN_PROGRESS) return;
-      if (err.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      const code = err?.code;
+      if (code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (code === statusCodes.IN_PROGRESS) return;
+      if (code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         Alert.alert('Erro', 'Google Play Services não disponível.');
         return;
       }
-      if (err.code === statusCodes.DEVELOPER_ERROR) {
+      if (code !== undefined && code === statusCodes.DEVELOPER_ERROR) {
         Alert.alert(
           'Erro de configuração',
-          'SHA-1 fingerprint não registrado no Firebase ou webClientId incorreto. Consulte o desenvolvedor.',
+          'SHA-1 fingerprint não registrado no Firebase ou webClientId incorreto.',
         );
-        console.error('[GoogleSignIn] DEVELOPER_ERROR: registre o SHA-1 do EAS no Firebase Console', err);
+        console.error('[GoogleSignIn] DEVELOPER_ERROR', err);
         return;
       }
+      console.error('[GoogleSignIn] signIn error', err);
       Alert.alert('Erro', err.message || 'Falha ao entrar com Google.');
     }
   }, [setAuth]);
