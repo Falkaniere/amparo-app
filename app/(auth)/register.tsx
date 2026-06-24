@@ -33,8 +33,7 @@ export default function RegisterScreen() {
     }
     try {
       setLoading(true);
-      await authService.register({ name, email, password, phone, role });
-      const data = await authService.login(email, password);
+      const data = await authService.register({ name, email, password, phone, role });
       setAuth(data.access_token, data.user);
       if (role === 'companion') {
         router.replace('/(companion)/home');

@@ -4,7 +4,11 @@ export const authService = {
   async register(payload: {
     name: string; email: string; password: string; phone: string; role: string;
   }) {
-    return apiFetch('/auth/register', {
+    return apiFetch<{
+      access_token: string;
+      refresh_token: string;
+      user: { id: string; email: string; name: string; role: 'family' | 'companion' | null };
+    }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
