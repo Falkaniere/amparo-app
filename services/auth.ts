@@ -2,7 +2,7 @@ import { apiFetch } from './api';
 
 export const authService = {
   async register(payload: {
-    name: string; email: string; password: string; phone: string; role: string;
+    name: string; email: string; password: string; phone: string; role: string; cpf?: string;
   }) {
     return apiFetch<{
       access_token: string;

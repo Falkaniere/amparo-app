@@ -21,19 +21,41 @@ export default function RegisterScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [cpf, setCpf] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('family');
   const [loading, setLoading] = useState(false);
   const { setAuth } = useAuthStore();
+
+  function handleCpfChange(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const masked = digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    setCpf(masked);
+  }
 
   async function handleRegister() {
     if (!name || !email || !password || !phone) {
       Alert.alert('Atenção', 'Preencha todos os campos.');
       return;
     }
+    const cpfDigits = cpf.replace(/\D/g, '');
+    if (role === 'companion' && cpfDigits.length !== 11) {
+      Alert.alert('Atenção', 'Informe um CPF válido.');
+      return;
+    }
     try {
       setLoading(true);
-      const data = await authService.register({ name, email, password, phone, role });
+      const data = await authService.register({
+        name,
+        email,
+        password,
+        phone,
+        role,
+        cpf: role === 'companion' ? cpfDigits : undefined,
+      });
       setAuth(data.access_token, data.user);
       if (role === 'companion') {
         router.replace('/(companion)/home');
@@ -118,6 +140,19 @@ export default function RegisterScreen() {
               />
             </View>
           ))}
+          {role === 'companion' && (
+            <View>
+              <Text style={styles.label}>CPF</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="000.000.000-00"
+                placeholderTextColor={colors.muted}
+                keyboardType="numeric"
+                value={cpf}
+                onChangeText={handleCpfChange}
+              />
+            </View>
+          )}
           <View>
             <Text style={styles.label}>SENHA</Text>
             <TextInput

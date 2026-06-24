@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  View, Text, Pressable, Image,
+  View, Text, Pressable, Image, TextInput,
   ActivityIndicator, Alert, StyleSheet,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -10,14 +10,42 @@ import { useAuthStore } from '@/store/auth';
 import { profileService } from '@/services/profile';
 import { colors, radius } from '@/constants/theme';
 
-type Step = 'photo' | 'document' | 'done';
+type Step = 'cpf' | 'photo' | 'document' | 'done';
 
 export default function CompanionOnboardingScreen() {
   const { token } = useAuthStore();
-  const [step, setStep] = useState<Step>('photo');
+  const [step, setStep] = useState<Step>('cpf');
+  const [cpf, setCpf] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [docUri, setDocUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  function handleCpfChange(value: string) {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    const masked = digits
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    setCpf(masked);
+  }
+
+  async function handleCpfSubmit() {
+    const digits = cpf.replace(/\D/g, '');
+    if (digits.length !== 11) {
+      Alert.alert('Atenção', 'Informe um CPF válido.');
+      return;
+    }
+    if (!token) return;
+    try {
+      setLoading(true);
+      await profileService.setCpf(token, digits);
+      setStep('photo');
+    } catch (err: any) {
+      Alert.alert('Erro', err.message || 'Não foi possível salvar o CPF.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function pickImage(source: 'camera' | 'library') {
     const fn = source === 'camera'
@@ -86,10 +114,38 @@ export default function CompanionOnboardingScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.inner}>
         <View style={styles.steps}>
+          <View style={[styles.stepDot, step === 'cpf' && styles.stepDotActive]} />
+          <View style={styles.stepLine} />
           <View style={[styles.stepDot, step === 'photo' && styles.stepDotActive]} />
           <View style={styles.stepLine} />
           <View style={[styles.stepDot, step === 'document' && styles.stepDotActive]} />
         </View>
+
+        {step === 'cpf' && (
+          <>
+            <Text style={styles.title}>Complete seu cadastro</Text>
+            <Text style={styles.subtitle}>
+              Informe seu CPF para validarmos sua identidade.
+            </Text>
+            <TextInput
+              style={styles.cpfInput}
+              placeholder="000.000.000-00"
+              placeholderTextColor={colors.muted}
+              keyboardType="numeric"
+              value={cpf}
+              onChangeText={handleCpfChange}
+            />
+            <Pressable
+              style={[styles.btn, (cpf.replace(/\D/g, '').length !== 11 || loading) && styles.btnDisabled]}
+              onPress={handleCpfSubmit}
+              disabled={cpf.replace(/\D/g, '').length !== 11 || loading}
+            >
+              {loading
+                ? <ActivityIndicator color="#fff" />
+                : <Text style={styles.btnText}>Continuar</Text>}
+            </Pressable>
+          </>
+        )}
 
         {step === 'photo' && (
           <>
@@ -164,6 +220,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   image: { width: '100%', height: '100%', resizeMode: 'cover' },
+  cpfInput: {
+    backgroundColor: colors.card,
+    borderWidth: 0.5,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: colors.text,
+    marginBottom: 32,
+  },
   imageBoxText: { color: colors.muted, fontSize: 14 },
   btn: {
     backgroundColor: colors.primary,

@@ -38,6 +38,13 @@ export const profileService = {
     });
   },
 
+  async setCpf(token: string, cpf: string) {
+    return apiFetch<{ cpf: string }>('/profile/companion/cpf', {
+      method: 'PUT', token,
+      body: JSON.stringify({ cpf }),
+    });
+  },
+
   async setOnline(token: string, is_online: boolean) {
     return apiFetch('/profile/companion/online', {
       method: 'PUT', token,
