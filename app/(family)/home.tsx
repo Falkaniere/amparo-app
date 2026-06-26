@@ -22,8 +22,8 @@ const SERVICE_TYPES = [
     label: 'Consulta médica',
     sub: 'Hospital · UPA',
   },
-  { key: 'now', emoji: '⚡', label: 'Agora', sub: 'Disponível agora' },
   { key: 'walk', emoji: '🌳', label: 'Passeio', sub: 'Parque · Compras' },
+  { key: 'errand', emoji: '🛒', label: 'Recados', sub: 'Compras · Banco' },
   { key: 'other', emoji: '➕', label: 'Outro serviço', sub: 'Personalizar' },
 ];
 

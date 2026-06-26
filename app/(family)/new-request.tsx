@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,16 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Platform,
   StyleSheet,
 } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { useAuthStore } from '@/store/auth';
 import { requestsService } from '@/services/requests';
 import { colors, radius } from '@/constants/theme';
@@ -30,26 +36,59 @@ export default function NewRequestScreen() {
 
   const [type, setType] = useState(params.type || 'medical');
   const [duration, setDuration] = useState(2);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState<Date | null>(null);
+  const [time, setTime] = useState<Date | null>(null);
   const [address, setAddress] = useState('');
   const [destination, setDestination] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showDate, setShowDate] = useState(false);
+  const [showTime, setShowTime] = useState(false);
+
+  // A tela vive dentro do Tabs navigator e permanece montada: limpamos os campos
+  // e ressincronizamos o serviço escolhido na home a cada vez que ela ganha foco.
+  useFocusEffect(
+    useCallback(() => {
+      setType(params.type || 'medical');
+      setDuration(2);
+      setDate(null);
+      setTime(null);
+      setAddress('');
+      setDestination('');
+      setNotes('');
+      setShowDate(false);
+      setShowTime(false);
+    }, [params.type, params.companion_id])
+  );
+
+  function onChangeDate(event: DateTimePickerEvent, selected?: Date) {
+    if (Platform.OS !== 'ios') setShowDate(false);
+    if (event.type === 'set' && selected) setDate(selected);
+  }
+
+  function onChangeTime(event: DateTimePickerEvent, selected?: Date) {
+    if (Platform.OS !== 'ios') setShowTime(false);
+    if (event.type === 'set' && selected) setTime(selected);
+  }
 
   async function handleSubmit() {
+    if (!params.companion_id) {
+      Alert.alert('Atenção', 'Escolha um acompanhante antes de enviar a solicitação.');
+      return;
+    }
     if (!date || !time || !address) {
       Alert.alert('Atenção', 'Preencha data, hora e endereço de saída.');
       return;
     }
 
-    const [d, m, y] = date.split('/');
-    const scheduledAt = `${y}-${m}-${d}T${time}:00`;
+    const scheduled = new Date(date);
+    scheduled.setHours(time.getHours(), time.getMinutes(), 0, 0);
+    const scheduledAt = format(scheduled, "yyyy-MM-dd'T'HH:mm:ss");
 
     try {
       setLoading(true);
       await requestsService.create(token!, {
-        companion_id: params.companion_id || '',
+        companion_id: params.companion_id,
         type,
         scheduled_at: scheduledAt,
         duration_hours: duration,
@@ -108,23 +147,43 @@ export default function NewRequestScreen() {
           <View style={styles.section}>
             <Text style={styles.label}>DATA E HORA</Text>
             <View style={styles.row}>
-              <TextInput
-                style={[styles.input, { flex: 1 }]}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor={colors.muted}
-                keyboardType="numeric"
-                value={date}
-                onChangeText={setDate}
-              />
-              <TextInput
-                style={[styles.input, { width: 90 }]}
-                placeholder="HH:MM"
-                placeholderTextColor={colors.muted}
-                keyboardType="numeric"
-                value={time}
-                onChangeText={setTime}
-              />
+              <Pressable
+                style={[styles.input, styles.pickerBtn, { flex: 1 }]}
+                onPress={() => setShowDate(true)}
+              >
+                <Text style={[styles.pickerText, !date && styles.pickerPlaceholder]}>
+                  {date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : 'Selecionar data'}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[styles.input, styles.pickerBtn, { width: 110 }]}
+                onPress={() => setShowTime(true)}
+              >
+                <Text style={[styles.pickerText, !time && styles.pickerPlaceholder]}>
+                  {time ? format(time, 'HH:mm') : 'Hora'}
+                </Text>
+              </Pressable>
             </View>
+            {showDate && (
+              <DateTimePicker
+                value={date || new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                minimumDate={new Date()}
+                locale="pt-BR"
+                onChange={onChangeDate}
+              />
+            )}
+            {showTime && (
+              <DateTimePicker
+                value={time || new Date()}
+                mode="time"
+                is24Hour
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                locale="pt-BR"
+                onChange={onChangeTime}
+              />
+            )}
           </View>
 
           {/* Duração */}
@@ -274,6 +333,9 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   textArea: { height: 80, textAlignVertical: 'top' },
+  pickerBtn: { justifyContent: 'center' },
+  pickerText: { fontSize: 14, color: colors.text },
+  pickerPlaceholder: { color: colors.muted },
   durationRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   durationBtn: {
     paddingHorizontal: 16,
